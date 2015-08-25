@@ -142,6 +142,13 @@ class TestClient(unittest.TestCase):
                                                    'queue',
                                                    'rt_key'))
 
+    def test_create_exchange_binding(self):
+        self.client.http.do_call = Mock(return_value=True)
+        self.assertTrue(self.client.create_exchange_binding('vhost',
+                                                            'source_exch',
+                                                            'dest_exch',
+                                                            'rt_key'))
+
     def test_delete_binding(self):
         self.client.http.do_call = Mock(return_value=True)
         self.assertTrue(self.client.delete_binding('vhost',

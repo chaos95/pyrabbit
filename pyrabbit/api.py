@@ -61,6 +61,7 @@ class Client(object):
             'bindings_by_dest_exch': 'exchanges/%s/%s/bindings/destination',
             'bindings_on_queue': 'queues/%s/%s/bindings',
             'bindings_between_exch_queue': 'bindings/%s/e/%s/q/%s',
+            'bindings_between_exch_exch': 'bindings/%s/e/%s/e/%s',
             'rt_bindings_between_exch_queue': 'bindings/%s/e/%s/q/%s/%s',
             'get_from_queue': 'queues/%s/%s/get',
             'publish_to_exchange': 'exchanges/%s/%s/publish',
@@ -731,6 +732,29 @@ class Client(object):
 
     def get_bindings_between_exch_and_queue(self, vhost, exch, queue):
         pass
+
+    def create_exchange_binding(self, vhost, source_exchange, dest_exchange, rt_key=None, args=None):
+        """
+        Creates a binding between an exchange and a queue on a given vhost.
+
+        :param string vhost: vhost housing the exchanges to bind
+        :param string source_exchange: the source exchange of the binding
+        :param string dest_exchange: the destination exchange of the binding
+        :param string rt_key: the routing key to use for the binding
+        :param list args: extra arguments to associate w/ the binding.
+        :returns: boolean
+        """
+
+        vhost = quote(vhost, '')
+        source_exchange = quote(source_exchange, '')
+        dest_exchange = quote(dest_exchange, '')
+        body = json.dumps({'routing_key': rt_key, 'arguments': args or []})
+        path = Client.urls['bindings_between_exch_exch'] % (vhost,
+                                                            source_exchange,
+                                                            dest_exchange)
+        binding = self._call(path, 'POST', body=body,
+                                    headers=Client.json_headers)
+        return binding
 
     def create_binding(self, vhost, exchange, queue, rt_key=None, args=None):
         """
